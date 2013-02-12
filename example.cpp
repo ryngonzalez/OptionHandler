@@ -6,7 +6,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-  // Define your the options you want to handle.
+  // Define the options you want to handle.
   const struct option options[5] = {
     {"output",  required_argument,  0, 'o'},
     {"stack",   no_argument,        0, 's'},
