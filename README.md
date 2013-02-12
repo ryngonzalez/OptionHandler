@@ -2,8 +2,8 @@
 A simple C++ wrapper for getopt_long.
 
 ## Useage
-To use with your code, simply include `unit_test_framework.h` in the file, 
-and compile against `unit_test_framework.cpp` or a generated object file.
+To use with your code, simply include `option_handler.h` in the file, 
+and compile against `option_handler.cpp` or a generated object file.
 
 ## License
 Copyright (&copy;) 2012 Ryan Gonzalez <ryan@ionizedmedia.com>
