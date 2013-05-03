@@ -12,9 +12,9 @@
  **********************************************************/
 
 // Dependencies
+#include <map>
 #include <string>
 #include <vector> 
-#include <unordered_map>
 #include <iostream>
 #include <stdexcept>
 
@@ -28,15 +28,13 @@
 
 namespace OptionHandler {
 
-  class no_argument_for_required : public std::invalid_argument 
-  { 
+  class no_argument_for_required : public std::invalid_argument { 
     public:
       no_argument_for_required() : 
       std::invalid_argument("REQUIRED option without argument") {} 
   };
 
-  class argument_for_none : public std::invalid_argument 
-  { 
+  class argument_for_none : public std::invalid_argument { 
     public:
       argument_for_none() : 
       std::invalid_argument("NONE option with argument") {} 
@@ -67,7 +65,7 @@ namespace OptionHandler {
     // Properties
     std::vector<Option> declared_options;
     std::vector<std::string> input;
-    std::unordered_map<std::string, std::vector<std::string>> parsed_input;
+    std::map<std::string, std::vector<std::string> > parsed_input;
 
     // Private Methods
     void update(Option option);
@@ -126,14 +124,14 @@ namespace OptionHandler {
   }
 
   inline std::string Handler::get_argument(std::string name) {
-    if (parsed_input.find(name) == parsed_input.end())
+    if (get_option(name))
       return "";
     else
       return parsed_input.at(name).empty() ? "" : parsed_input.at(name).front();
   }
 
   inline std::vector<std::string> Handler::get_arguments(std::string name) {
-    if (parsed_input.find(name) == parsed_input.end())
+    if (get_option(name))
       return std::vector<std::string>();
     else
       return parsed_input.at(name);
@@ -141,9 +139,11 @@ namespace OptionHandler {
 
   inline void Handler::update(Option option) {
 
-    for (auto str = input.begin(); str != input.end(); ++str) {
-
-      if ((*str).size() <= 1)
+    // Get start of input
+    std::vector<std::string>::iterator str = input.begin();
+    while (str != input.end()) {
+      // If there was no input
+      if ((*str).size() < 1)
         continue;
       if ((*str).at(1) == option.short_name || (*str).substr(2) == option.long_name) {
 
@@ -158,6 +158,8 @@ namespace OptionHandler {
           update_optional(option, str);
 
       } 
+      // Next input
+      str += 1;
     } 
   }
 
@@ -185,16 +187,13 @@ namespace OptionHandler {
   inline void Handler::update_optional(Option option, std::vector<std::string>::iterator str) {
     if(str+1 != input.end()) str++;
 
-    while(str != input.end() && !is_long(*str) && !is_short(*str))
-    {
-      if(parsed_input.find(option.long_name) == parsed_input.end())
-      {
+    while(str != input.end() && !is_long(*str) && !is_short(*str)) {
+      if(parsed_input.find(option.long_name) == parsed_input.end()) {
         parsed_input.insert(
           std::make_pair(option.long_name, std::vector<std::string>(1, *(str)))
         );      
       }
-      else
-      {
+      else {
         if(option.multiple)
           parsed_input.at(option.long_name).push_back(*(str));
         else
