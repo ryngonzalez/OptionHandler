@@ -1,15 +1,16 @@
-#ifndef OPTION_HANDLER_H
-#define OPTION_HANDLER_H
 /**********************************************************
  *
  * @project: OptionHandler
- * @author:  Ryan Gonzalez
- * @date:    February 11
+ * @author:  Ryan Gonzalez & Haoran Ning
+ * @date:    May 3
  * @file:    option_handler.h
  *
- * Makes option handling for C++ programs easy.
+ * Makes command line option handling for C++ programs easy.
  *
  **********************************************************/
+
+#ifndef OPTION_HANDLER_H
+#define OPTION_HANDLER_H
 
 // Dependencies
 #include <map>
