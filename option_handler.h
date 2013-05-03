@@ -40,7 +40,7 @@ namespace OptionHandler {
       std::invalid_argument("NONE option with argument") {} 
   };
 
-  enum class ArgumentType { NONE, REQUIRED, OPTIONAL };
+  enum ArgumentType { NONE, REQUIRED, OPTIONAL };
 
   class Handler {
   private:  
