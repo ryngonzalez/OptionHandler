@@ -12,9 +12,9 @@
  **********************************************************/
 
 // Dependencies
+#include <map>
 #include <string>
 #include <vector> 
-#include <unordered_map>
 #include <iostream>
 #include <stdexcept>
 
@@ -67,7 +67,7 @@ namespace OptionHandler {
     // Properties
     std::vector<Option> declared_options;
     std::vector<std::string> input;
-    std::unordered_map<std::string, std::vector<std::string>> parsed_input;
+    std::map<std::string, std::vector<std::string> > parsed_input;
 
     // Private Methods
     void update(Option option);
