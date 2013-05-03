@@ -6,7 +6,7 @@ To use with your code, simply include `option_handler.h` in the file,
 and compile against `option_handler.cpp` or a generated object file.
 
 ## License
-Copyright (&copy;) 2012 Ryan Gonzalez <ryan@ionizedmedia.com>
+Copyright (&copy;) 2012 Ryan Gonzalez <ryan@ionizedmedia.com> &amp; Haoran Ning
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of 
 this software and associated documentation files (the "Software"), to deal in 
