@@ -139,9 +139,11 @@ namespace OptionHandler {
 
   inline void Handler::update(Option option) {
 
-    for (auto str = input.begin(); str != input.end(); ++str) {
-
-      if ((*str).size() <= 1)
+    // Get start of input
+    std::vector<std::string>::iterator str = input.begin();
+    while (str != input.end()) {
+      // If there was no input
+      if ((*str).size() < 1)
         continue;
       if ((*str).at(1) == option.short_name || (*str).substr(2) == option.long_name) {
 
@@ -156,6 +158,8 @@ namespace OptionHandler {
           update_optional(option, str);
 
       } 
+      // Next input
+      str += 1;
     } 
   }
 
