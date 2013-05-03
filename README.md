@@ -1,7 +1,7 @@
 # OptionHandler
 A simple C++ wrapper for getopt_long.
 
-## Useage
+## Usage
 To use with your code, simply include `option_handler.h` in the file, 
 and compile against `option_handler.cpp` or a generated object file.
 
