@@ -16,6 +16,7 @@
 #include <string>
 #include <vector> 
 #include <unordered_map>
+#include <map>
 #include <iostream>
 #include <stdexcept>
 
@@ -128,22 +129,6 @@ namespace OptionHandler {
     return *this;
   }
 
-
-/**********************************************************
- *
- * @class: Handler
- * @method: get_option
- * @description: Checks whether an option has been parsed
- * or not, given the short name.
- *
- **********************************************************/
-
-  // TODO: make short name getting easier
-  inline bool get_option(char short_name) {
-    return false;
-  }
-
-
 /**********************************************************
  *
  * @class: Handler
@@ -245,58 +230,14 @@ namespace OptionHandler {
         if (option.type == ArgumentType::NONE)
           update_none(option, str);
 
-        // Check if value exists, 
-        // if ((option.type == ArgumentType::REQUIRED) && ((str+1) != input.end())) {
-        //   // Exit if required but not present
-        //   // TODO: more intuitive error handling
-        //   if (is_long(*(str+1)) || is_short(*(str+1))) exit(1);
-
-        //   if (parsed_input.find(option.long_name) == parsed_input.end()) {
-        //     // Insert vector with value
-        //     parsed_input.insert(
-        //       std::make_pair(option.long_name, std::vector<std::string>(1, *(str+1)))
-        //     );
-        //   } else {
-        //     parsed_input.at(option.long_name).push_back(*(str+1));
-        //   }
-        // }
-
         if(option.type == ArgumentType::REQUIRED)
           update_required(option, str);
 
         if(option.type == ArgumentType::OPTIONAL)
           update_optional(option, str);
 
-        /*
-        if (option.type == ArgumentType::OPTIONAL || option.type == ArgumentType::REQUIRED) {
-          // If no value exists, insert empty vector
-          if (((str+1) != input.end()) && (is_long(*(str+1)) || is_short(*(str+1)))) {
-            if (parsed_input.find(option.long_name) == parsed_input.end()) {
-              // Insert vector with value
-              parsed_input.insert(
-                std::make_pair(option.long_name, std::vector<std::string>())
-              );
-            }
-          } else if ((str+1) != input.end()){
-            if (parsed_input.find(option.long_name) == parsed_input.end()) {
-              // Insert vector with value
-              parsed_input.insert(
-                std::make_pair(option.long_name, std::vector<std::string>(1, *(str+1)))
-              );
-            } else {
-              parsed_input.at(option.long_name).push_back(*(str+1));
-            }
-          } else {
-            if (parsed_input.find(option.long_name) == parsed_input.end()) {
-              // Insert vector with value
-              parsed_input.insert(
-                std::make_pair(option.long_name, std::vector<std::string>())
-              );
-            }
-          }
-        }*/
       } 
-    } // Handler::update()
+    } 
   }
 }
 
