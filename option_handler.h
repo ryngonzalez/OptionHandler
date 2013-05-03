@@ -1,3 +1,5 @@
+#ifndef OPTION_HANDLER_H
+#define OPTION_HANDLER_H
 /**********************************************************
  *
  * @project: OptionHandler
@@ -9,14 +11,10 @@
  *
  **********************************************************/
 
-#ifndef OPTION_HANDLER_H
-#define OPTION_HANDLER_H
-
 // Dependencies
 #include <string>
 #include <vector> 
 #include <unordered_map>
-#include <map>
 #include <iostream>
 #include <stdexcept>
 
@@ -69,17 +67,19 @@ namespace OptionHandler {
     // Properties
     std::vector<Option> declared_options;
     std::vector<std::string> input;
-    std::map<std::string, std::vector<std::string> > parsed_input;
+    std::unordered_map<std::string, std::vector<std::string>> parsed_input;
 
     // Private Methods
     void update(Option option);
 
-    void update_none(Option option, std::vector<std::string>::iterator str);
-    void update_required(Option option, std::vector<std::string>::iterator str);
-    void update_optional(Option option, std::vector<std::string>::iterator str);
+    void update_none(Option option, 
+      std::vector<std::string>::iterator str);
+    void update_required(Option option, 
+      std::vector<std::string>::iterator str);
+    void update_optional(Option option, 
+      std::vector<std::string>::iterator str);
 
   public:
-    // Constructor
     Handler(int argc, char** argv) : 
             input(std::vector<std::string>(argv + 1, argv + argc))
             {};
@@ -100,21 +100,11 @@ namespace OptionHandler {
     bool is_short(std::string s) { 
       return ((s.at(0) == '-') && (s.at(1) != '-'));
     };
-
     bool is_long(std::string s)  {
       return ((s.at(0) == '-') && (s.at(1) == '-'));
     };  
   };
 
-
-/**********************************************************
- *
- * @class: Handler
- * @method: get_option
- * @description: Add an option, and then update the
- * parsed_options hash.
- *
- **********************************************************/
 
   inline Handler& Handler::add_option(char short_name, 
                                       std::string long_name,
@@ -129,51 +119,46 @@ namespace OptionHandler {
     return *this;
   }
 
-/**********************************************************
- *
- * @class: Handler
- * @method: get_option
- * @description: Checks whether an option has been parsed
- * or not, given the long name.
- *
- **********************************************************/
-
+  // TODO: make short name getting easier
+  // inline bool get_option(char short_name) {}
   inline bool Handler::get_option(std::string name) {
     return (parsed_input.find(name) != parsed_input.end());
   }
 
-
-/**********************************************************
- *
- * @class: Handler
- * @method: get_argument
- * @description: Returns the first argument for a given 
- * option.
- *
- **********************************************************/
-
   inline std::string Handler::get_argument(std::string name) {
-    if (get_option(name))
+    if (parsed_input.find(name) == parsed_input.end())
       return "";
     else
       return parsed_input.at(name).empty() ? "" : parsed_input.at(name).front();
   }
-
-
-/**********************************************************
- *
- * @class: Handler
- * @method: get_arguments
- * @description: Gets the arguments passed to the given 
- * option.
- *
- **********************************************************/
 
   inline std::vector<std::string> Handler::get_arguments(std::string name) {
     if (parsed_input.find(name) == parsed_input.end())
       return std::vector<std::string>();
     else
       return parsed_input.at(name);
+  }
+
+  inline void Handler::update(Option option) {
+
+    for (auto str = input.begin(); str != input.end(); ++str) {
+
+      if ((*str).size() <= 1)
+        continue;
+      if ((*str).at(1) == option.short_name || (*str).substr(2) == option.long_name) {
+
+        // Create empty vector if type = none
+        if (option.type == ArgumentType::NONE)
+          update_none(option, str);
+
+        if(option.type == ArgumentType::REQUIRED)
+          update_required(option, str);
+
+        if(option.type == ArgumentType::OPTIONAL)
+          update_optional(option, str);
+
+      } 
+    } 
   }
 
   inline void Handler::update_none(Option option, std::vector<std::string>::iterator str) {
@@ -190,8 +175,9 @@ namespace OptionHandler {
   }
 
   inline void Handler::update_required(Option option, std::vector<std::string>::iterator str) {
-    if (((str+1) == input.end()) || (is_long(*(str+1)) || is_short(*(str+1))))
+    if (((str+1) == input.end()) || (is_long(*(str+1)) || is_short(*(str+1)))) {
       throw no_argument_for_required();
+    }
 
     update_optional(option, str);
   }
@@ -216,28 +202,6 @@ namespace OptionHandler {
       }
       str++;
     }
-  }
-
-  inline void Handler::update(Option option) {
-
-    for (std::vector<std::string>::iterator str = input.begin(); str != input.end(); ++str) {
-
-      if ((*str).size() <= 1)
-        continue;
-      if ((*str).at(1) == option.short_name || (*str).substr(2) == option.long_name) {
-
-        // Create empty vector if type = none
-        if (option.type == ArgumentType::NONE)
-          update_none(option, str);
-
-        if(option.type == ArgumentType::REQUIRED)
-          update_required(option, str);
-
-        if(option.type == ArgumentType::OPTIONAL)
-          update_optional(option, str);
-
-      } 
-    } 
   }
 }
 
