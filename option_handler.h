@@ -45,7 +45,7 @@ namespace OptionHandler {
     // Properties
     std::vector<Option> declared_options;
     std::vector<std::string> input;
-    std::unordered_map<std::string, std::vector<std::string>> parsed_input;
+    std::map<std::string, std::vector<std::string> > parsed_input;
 
     // Private Methods
     void update(Option option);
@@ -112,7 +112,7 @@ namespace OptionHandler {
 
   inline void Handler::update(Option option) {
 
-    for (auto str = input.begin(); str != input.end(); ++str) {
+    for (std::vector<std::string>::iterator str = input.begin(); str != input.end(); ++str) {
 
       if ((*str).size() <= 1)
         continue;
