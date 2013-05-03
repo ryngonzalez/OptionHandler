@@ -1,5 +1,3 @@
-#ifndef OPTION_HANDLER_H
-#define OPTION_HANDLER_H
 /**********************************************************
  *
  * @project: OptionHandler
@@ -11,19 +9,14 @@
  *
  **********************************************************/
 
+#ifndef OPTION_HANDLER_H
+#define OPTION_HANDLER_H
+
 // Dependencies
 #include <string>
 #include <vector> 
 #include <unordered_map>
 #include <iostream>
-
-/**********************************************************
- *
- * @class: OptionHandler
- * @description: Parses argv and determines whether flags
- * are set.
- *
- **********************************************************/
 
 namespace OptionHandler {
 
