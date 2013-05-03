@@ -51,6 +51,7 @@ namespace OptionHandler {
     void update(Option option);
 
   public:
+    // Constructor
     Handler(int argc, char** argv) : 
             input(std::vector<std::string>(argv + 1, argv + argc))
             {};
@@ -71,11 +72,21 @@ namespace OptionHandler {
     bool is_short(std::string s) { 
       return ((s.at(0) == '-') && (s.at(1) != '-'));
     };
+
     bool is_long(std::string s)  {
       return ((s.at(0) == '-') && (s.at(1) == '-'));
     };  
   };
 
+
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: get_option
+ * @description: Add an option, and then update the
+ * parsed_options hash.
+ *
+ **********************************************************/
 
   inline Handler& Handler::add_option(char short_name, 
                                       std::string long_name,
@@ -90,18 +101,61 @@ namespace OptionHandler {
     return *this;
   }
 
+
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: get_option
+ * @description: Checks whether an option has been parsed
+ * or not, given the short name.
+ *
+ **********************************************************/
+
   // TODO: make short name getting easier
-  // inline bool get_option(char short_name) {}
+  inline bool get_option(char short_name) {
+    return false;
+  }
+
+
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: get_option
+ * @description: Checks whether an option has been parsed
+ * or not, given the long name.
+ *
+ **********************************************************/
+
   inline bool Handler::get_option(std::string name) {
     return (parsed_input.find(name) != parsed_input.end());
   }
 
+
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: get_argument
+ * @description: Returns the first argument for a given 
+ * option.
+ *
+ **********************************************************/
+
   inline std::string Handler::get_argument(std::string name) {
-    if (parsed_input.find(name) == parsed_input.end())
+    if (get_option(name))
       return "";
     else
       return parsed_input.at(name).empty() ? "" : parsed_input.at(name).front();
   }
+
+
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: get_arguments
+ * @description: Gets the arguments passed to the given 
+ * option.
+ *
+ **********************************************************/
 
   inline std::vector<std::string> Handler::get_arguments(std::string name) {
     if (parsed_input.find(name) == parsed_input.end())
@@ -109,6 +163,16 @@ namespace OptionHandler {
     else
       return parsed_input.at(name);
   }
+
+
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: update
+ * @description: Updates the parsed_options map with a new 
+ * option by re-parsing the input vector.
+ *
+ **********************************************************/
 
   inline void Handler::update(Option option) {
 
