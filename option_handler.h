@@ -28,15 +28,13 @@
 
 namespace OptionHandler {
 
-  class no_argument_for_required : public std::invalid_argument 
-  { 
+  class no_argument_for_required : public std::invalid_argument { 
     public:
       no_argument_for_required() : 
       std::invalid_argument("REQUIRED option without argument") {} 
   };
 
-  class argument_for_none : public std::invalid_argument 
-  { 
+  class argument_for_none : public std::invalid_argument { 
     public:
       argument_for_none() : 
       std::invalid_argument("NONE option with argument") {} 
@@ -185,16 +183,13 @@ namespace OptionHandler {
   inline void Handler::update_optional(Option option, std::vector<std::string>::iterator str) {
     if(str+1 != input.end()) str++;
 
-    while(str != input.end() && !is_long(*str) && !is_short(*str))
-    {
-      if(parsed_input.find(option.long_name) == parsed_input.end())
-      {
+    while(str != input.end() && !is_long(*str) && !is_short(*str)) {
+      if(parsed_input.find(option.long_name) == parsed_input.end()) {
         parsed_input.insert(
           std::make_pair(option.long_name, std::vector<std::string>(1, *(str)))
         );      
       }
-      else
-      {
+      else {
         if(option.multiple)
           parsed_input.at(option.long_name).push_back(*(str));
         else
