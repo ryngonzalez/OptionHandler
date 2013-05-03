@@ -22,8 +22,8 @@
 /**********************************************************
  *
  * @class: OptionHandler
- * @description: Parses argv and determines whether flags
- * are set.
+ * @description: Parses input and determines whether options
+ * and arguments to those options are set.
  *
  **********************************************************/
 
@@ -70,7 +70,6 @@ namespace OptionHandler {
 
     // Private Methods
     void update(Option option);
-
     void update_none(Option option, 
       std::vector<std::string>::iterator str);
     void update_required(Option option, 
@@ -104,6 +103,13 @@ namespace OptionHandler {
     };  
   };
 
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: add_option
+ * @description: Sets a new option to handle from input.
+ *
+ **********************************************************/
 
   inline Handler& Handler::add_option(char short_name, 
                                       std::string long_name,
@@ -118,25 +124,59 @@ namespace OptionHandler {
     return *this;
   }
 
-  // TODO: make short name getting easier
-  // inline bool get_option(char short_name) {}
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: get_option
+ * @description: Returns whether an option has been passed
+ * from input, given the long name of the option.
+ *
+ **********************************************************/
+
   inline bool Handler::get_option(std::string name) {
-    return (parsed_input.find(name) != parsed_input.end());
+    return ((parsed_input.find(name) != parsed_input.end())  || parsed_input.empty());
   }
 
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: get_argument
+ * @description: Returns the argument passed with a given
+ * option.
+ *
+ **********************************************************/
+
   inline std::string Handler::get_argument(std::string name) {
-    if (!get_option(name) || parsed_input.empty())
+    if (!get_option(name))
       return "";
     else
       return parsed_input.at(name).empty() ? "" : parsed_input.at(name).front();
   }
 
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: get_argument
+ * @description: Returns the vector of arguments passed with
+ * a given option.
+ *
+ **********************************************************/
+
   inline std::vector<std::string> Handler::get_arguments(std::string name) {
-    if (!get_option(name) || parsed_input.empty())
+    if (!get_option(name))
       return std::vector<std::string>();
     else
       return parsed_input.at(name);
   }
+
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: update
+ * @description: Given an option, update the parsed argument
+ * map appropriately.
+ *
+ **********************************************************/
 
   inline void Handler::update(Option option) {
     // Get start of input
@@ -163,11 +203,21 @@ namespace OptionHandler {
     } 
   }
 
-  inline void Handler::update_none(Option option, std::vector<std::string>::iterator str) {
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: update_none
+ * @description: If the ArgumentType doesn't require an
+ * argument, either throw an error (if given an argument)
+ * or insert it into the map if it doesn't already exist.
+ *
+ **********************************************************/
+
+  inline void Handler::update_none(const Option & option, std::vector<std::string>::iterator str) {
     if (((str+1) != input.end()) && (!is_long(*(str+1)) && !is_short(*(str+1))))
       throw argument_for_none();
 
-    // Only if it doesn't already exist in hash
+    // Only if it doesn't already exist in map
     if (parsed_input.find(option.long_name) == parsed_input.end()) {
       // Insert empty vector
       parsed_input.insert(
@@ -176,28 +226,57 @@ namespace OptionHandler {
     }
   }
 
-  inline void Handler::update_required(Option option, std::vector<std::string>::iterator str) {
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: update_required
+ * @description: If the ArgumentType does require an argument,
+ * throw an error (if not given an argument) or handle it
+ * like an optional argument.
+ *
+ **********************************************************/
+
+  inline void Handler::update_required(const Option & option, std::vector<std::string>::iterator str) {
     if (((str+1) == input.end()) || (is_long(*(str+1)) || is_short(*(str+1)))) {
       throw no_argument_for_required();
     }
     update_optional(option, str);
   }
 
-  inline void Handler::update_optional(Option option, std::vector<std::string>::iterator str) {
+/**********************************************************
+ *
+ * @class: Handler
+ * @method: update_optional
+ * @description: If the the option allows multiple arguments
+ * passed to an option (Ex. --person Haoran --person Ryan or
+ * --person Ryan Haoran Guan) then push arguments into a 
+ * vector. Else, the last argument passed will be the 
+ * argument set for the option in the map.
+ *
+ **********************************************************/
+
+  inline void Handler::update_optional(const Option & option, std::vector<std::string>::iterator str) {
+    // Increment to check the argument
     if(str+1 != input.end()) str++;
+    // If the iterator is not at the end and we haven't encountered another option
     while(str != input.end() && !is_long(*str) && !is_short(*str)) {
+      // If the option doesn't already exist in map
       if(parsed_input.find(option.long_name) == parsed_input.end()) {
+        // Insert into parsed options map
         parsed_input.insert(
           std::make_pair(option.long_name, std::vector<std::string>(1, *(str)))
         );      
       }
       else {
+        // If the option allows multiple arguments to it,
+        // push into arguments vector
         if(option.multiple)
           parsed_input.at(option.long_name).push_back(*(str));
         else
           parsed_input.at(option.long_name)[0] = *str;
       }
-      str++;
+      // Next input
+      str += 1;
     }
   }
 }
