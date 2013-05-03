@@ -22,10 +22,10 @@ int main(int argc, char *argv[])
     std::cout << "The options for this program are..." << std::endl;
 
   // Make sure 'mode' option is set and that an argument was provided to it.
-  if (!mode_set || mode == "") {
+  /*if (!mode_set || mode == "") {
     std::cerr << "Mode must be set.\n";
     exit(1);
-  }
+  }*/
 
   // Check the values
   std::cout << help     << std::endl;

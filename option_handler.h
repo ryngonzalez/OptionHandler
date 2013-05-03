@@ -16,6 +16,7 @@
 #include <vector> 
 #include <unordered_map>
 #include <iostream>
+#include <stdexcept>
 
 /**********************************************************
  *
@@ -26,6 +27,20 @@
  **********************************************************/
 
 namespace OptionHandler {
+
+  class no_argument_for_required : public std::invalid_argument 
+  { 
+    public:
+      no_argument_for_required() : 
+      std::invalid_argument("REQUIRED option without argument") {} 
+  };
+
+  class no_argument_for_none : public std::invalid_argument 
+  { 
+    public:
+      no_argument_for_none() : 
+      std::invalid_argument("NONE option with argument") {} 
+  };
 
   enum class ArgumentType { NONE, REQUIRED, OPTIONAL };
 
@@ -56,6 +71,10 @@ namespace OptionHandler {
 
     // Private Methods
     void update(Option option);
+
+    void update_none(Option option, std::vector<std::string>::iterator str);
+    void update_required(Option option, std::vector<std::string>::iterator str);
+    void update_optional(Option option, std::vector<std::string>::iterator str);
 
   public:
     Handler(int argc, char** argv) : 
@@ -117,6 +136,58 @@ namespace OptionHandler {
       return parsed_input.at(name);
   }
 
+  inline void Handler::update_none(Option option, std::vector<std::string>::iterator str) {
+    if (((str+1) != input.end()) && (!is_long(*(str+1)) && !is_short(*(str+1))))
+      throw no_argument_for_none();
+
+    // Only if it doesn't already exist in hash
+    if (parsed_input.find(option.long_name) == parsed_input.end()) {
+      // Insert empty vector
+      parsed_input.insert(
+        std::make_pair(option.long_name, std::vector<std::string>())
+      );
+    }
+  }
+
+  inline void Handler::update_required(Option option, std::vector<std::string>::iterator str) {
+    if (((str+1) == input.end()) || (is_long(*(str+1)) || is_short(*(str+1))))
+      throw no_argument_for_required();
+    
+    str++;
+    while(!is_long(str) && !is_short(str))
+    {
+      if(parsed_input.find(option.long_name) == parsed_input.end())
+    }
+      
+  }
+
+  inline void Handler::update_optional(Option option, std::vector<std::string>::iterator str) {
+    if (((str+1) != input.end()) && (is_long(*(str+1)) || is_short(*(str+1)))) {
+      if (parsed_input.find(option.long_name) == parsed_input.end()) {
+        // Insert vector with value
+        parsed_input.insert(
+          std::make_pair(option.long_name, std::vector<std::string>())
+        );
+      }
+    } else if ((str+1) != input.end()){
+      if (parsed_input.find(option.long_name) == parsed_input.end()) {
+        // Insert vector with value
+        parsed_input.insert(
+          std::make_pair(option.long_name, std::vector<std::string>(1, *(str+1)))
+        );
+      } else {
+        parsed_input.at(option.long_name).push_back(*(str+1));
+      }
+    } else {
+      if (parsed_input.find(option.long_name) == parsed_input.end()) {
+        // Insert vector with value
+        parsed_input.insert(
+          std::make_pair(option.long_name, std::vector<std::string>())
+        );
+      }
+    }
+  }
+
   inline void Handler::update(Option option) {
 
     for (auto str = input.begin(); str != input.end(); ++str) {
@@ -126,15 +197,8 @@ namespace OptionHandler {
       if ((*str).at(1) == option.short_name || (*str).substr(2) == option.long_name) {
 
         // Create empty vector if type = none
-        if (option.type == ArgumentType::NONE) {
-          // Only if it doesn't already exist in hash
-          if (parsed_input.find(option.long_name) == parsed_input.end()) {
-            // Insert empty vector
-            parsed_input.insert(
-              std::make_pair(option.long_name, std::vector<std::string>())
-            );
-          }
-        }
+        if (option.type == ArgumentType::NONE)
+          update_none(option, str);
 
         // Check if value exists, 
         // if ((option.type == ArgumentType::REQUIRED) && ((str+1) != input.end())) {
@@ -152,6 +216,13 @@ namespace OptionHandler {
         //   }
         // }
 
+        if(option.type == ArgumentType::REQUIRED)
+          update_required(option, str);
+
+        if(option.type == ArgumentType::OPTIONAL)
+          update_optional(option, str);
+
+        /*
         if (option.type == ArgumentType::OPTIONAL || option.type == ArgumentType::REQUIRED) {
           // If no value exists, insert empty vector
           if (((str+1) != input.end()) && (is_long(*(str+1)) || is_short(*(str+1)))) {
@@ -178,7 +249,7 @@ namespace OptionHandler {
               );
             }
           }
-        }
+        }*/
       } 
     } // Handler::update()
   }
