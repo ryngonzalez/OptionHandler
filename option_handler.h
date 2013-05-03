@@ -124,14 +124,14 @@ namespace OptionHandler {
   }
 
   inline std::string Handler::get_argument(std::string name) {
-    if (parsed_input.find(name) == parsed_input.end())
+    if (get_option(name))
       return "";
     else
       return parsed_input.at(name).empty() ? "" : parsed_input.at(name).front();
   }
 
   inline std::vector<std::string> Handler::get_arguments(std::string name) {
-    if (parsed_input.find(name) == parsed_input.end())
+    if (get_option(name))
       return std::vector<std::string>();
     else
       return parsed_input.at(name);
