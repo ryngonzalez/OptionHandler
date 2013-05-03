@@ -35,10 +35,10 @@ namespace OptionHandler {
       std::invalid_argument("REQUIRED option without argument") {} 
   };
 
-  class no_argument_for_none : public std::invalid_argument 
+  class argument_for_none : public std::invalid_argument 
   { 
     public:
-      no_argument_for_none() : 
+      argument_for_none() : 
       std::invalid_argument("NONE option with argument") {} 
   };
 
@@ -138,7 +138,7 @@ namespace OptionHandler {
 
   inline void Handler::update_none(Option option, std::vector<std::string>::iterator str) {
     if (((str+1) != input.end()) && (!is_long(*(str+1)) && !is_short(*(str+1))))
-      throw no_argument_for_none();
+      throw argument_for_none();
 
     // Only if it doesn't already exist in hash
     if (parsed_input.find(option.long_name) == parsed_input.end()) {
@@ -152,39 +152,29 @@ namespace OptionHandler {
   inline void Handler::update_required(Option option, std::vector<std::string>::iterator str) {
     if (((str+1) == input.end()) || (is_long(*(str+1)) || is_short(*(str+1))))
       throw no_argument_for_required();
-    
-    str++;
-    while(!is_long(str) && !is_short(str))
-    {
-      if(parsed_input.find(option.long_name) == parsed_input.end())
-    }
-      
+
+    update_optional(option, str);
   }
 
   inline void Handler::update_optional(Option option, std::vector<std::string>::iterator str) {
-    if (((str+1) != input.end()) && (is_long(*(str+1)) || is_short(*(str+1)))) {
-      if (parsed_input.find(option.long_name) == parsed_input.end()) {
-        // Insert vector with value
+    if(str+1 != input.end()) str++;
+
+    while(str != input.end() && !is_long(*str) && !is_short(*str))
+    {
+      if(parsed_input.find(option.long_name) == parsed_input.end())
+      {
         parsed_input.insert(
-          std::make_pair(option.long_name, std::vector<std::string>())
-        );
+          std::make_pair(option.long_name, std::vector<std::string>(1, *(str)))
+        );      
       }
-    } else if ((str+1) != input.end()){
-      if (parsed_input.find(option.long_name) == parsed_input.end()) {
-        // Insert vector with value
-        parsed_input.insert(
-          std::make_pair(option.long_name, std::vector<std::string>(1, *(str+1)))
-        );
-      } else {
-        parsed_input.at(option.long_name).push_back(*(str+1));
+      else
+      {
+        if(option.multiple)
+          parsed_input.at(option.long_name).push_back(*(str));
+        else
+          parsed_input.at(option.long_name)[0] = *str;
       }
-    } else {
-      if (parsed_input.find(option.long_name) == parsed_input.end()) {
-        // Insert vector with value
-        parsed_input.insert(
-          std::make_pair(option.long_name, std::vector<std::string>())
-        );
-      }
+      str++;
     }
   }
 
