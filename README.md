@@ -1,4 +1,4 @@
-# OptionHandler
+# OptionHandler 0.2
 Make handling command line options in C++ easy with a sane, simple API. A replacement for [getopt_long](http://www.gnu.org/software/libc/manual/html_node/Getopt.html#Getopt).
 
 ## Useage
