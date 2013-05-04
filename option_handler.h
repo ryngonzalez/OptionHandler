@@ -31,14 +31,14 @@ namespace OptionHandler {
 
   class no_argument_for_required : public std::invalid_argument { 
     public:
-      no_argument_for_required() : 
-      std::invalid_argument("REQUIRED option without argument") {} 
+      no_argument_for_required(std::string option_name) : 
+      std::invalid_argument("REQUIRED option '" + option_name + "' without argument") {} 
   };
 
   class argument_for_none : public std::invalid_argument { 
     public:
-      argument_for_none() : 
-      std::invalid_argument("NONE option with argument") {} 
+      argument_for_none(std::string option_name) : 
+      std::invalid_argument("NONE option '" + option_name + "' with argument") {} 
   };
 
   enum ArgumentType { NONE, REQUIRED, OPTIONAL };
