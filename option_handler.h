@@ -69,12 +69,12 @@ namespace OptionHandler {
     std::map<std::string, std::vector<std::string> > parsed_input;
 
     // Private Methods
-    void update(Option option);
-    void update_none(Option option, 
+    void update(const Option & option);
+    void update_none(const Option & option, 
       std::vector<std::string>::iterator str);
-    void update_required(Option option, 
+    void update_required(const Option & option, 
       std::vector<std::string>::iterator str);
-    void update_optional(Option option, 
+    void update_optional(const Option & option, 
       std::vector<std::string>::iterator str);
 
   public:
