@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Optionhandler by ryngonzalez</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Optionhandler</h1>
+        <p class="header">Make handling command line options in C++ easy with a sane, simple API. A replacement for getopt_long.</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/ryngonzalez/OptionHandler/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/ryngonzalez/OptionHandler/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/ryngonzalez/OptionHandler">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/ryngonzalez">ryngonzalez</a></p>
+
+
+      </header>
+      <section>
+        <h1>OptionHandler 0.2</h1>
+
+<p>Make handling command line options in C++ easy with a sane, simple API. A replacement for <a href="http://www.gnu.org/software/libc/manual/html_node/Getopt.html#Getopt">getopt_long</a>.</p>
+
+<h2>Useage</h2>
+
+<p>To use with your code, simply include <code>option_handler.h</code> in your <code>.cpp</code>, <code>.hpp</code>, or <code>.h</code> file.</p>
+
+<h3>Command Line Usage</h3>
+
+<p>On the command line you can allow your program to take in long or short options.</p>
+
+<pre><code>./myprogram --mode FASTMODE --stocks GOOG AAPL AMZN --statistics
+</code></pre>
+
+<p>This is equivalent:</p>
+
+<pre><code>./myprogram -m FASTMODE -s GOOG AAPL AMZN -t
+</code></pre>
+
+<h3>Developer Usage</h3>
+
+<h4>Instantiation</h4>
+
+<p>Instantiate an option handler by passing in the command line input (<code>argv</code> and <code>argc</code>):</p>
+
+<pre><code>OptionHandler::Handler h = OptionHandler::Handler(argc, argv);
+</code></pre>
+
+<h5>Adding Options</h5>
+
+<p>Add options with <code>add_option</code>:</p>
+
+<pre><code>// Follows h.add_option(short_name, long_name, arg_type, multiple);
+// For example: 
+h.add_option('m', "mode", OptionHandler::REQUIRED, false);
+</code></pre>
+
+<p>And options has these arguments:</p>
+
+<ol>
+<li>
+<code>short_name</code> is a <code>char</code>
+</li>
+<li>
+<code>long_name</code> is a <code>std::string</code>
+</li>
+<li>
+<code>arg_type</code> is one of 
+
+<ul>
+<li>
+<code>OptionHandler::NONE</code>
+
+<ul>
+<li>If an option is NONE, and an argument is passed to it, an exception is thrown</li>
+<li>All NONE options should be wrapped in a try/catch block </li>
+</ul>
+</li>
+<li>
+<code>OptionHandler::REQUIRED</code>
+
+<ul>
+<li>If an option is REQUIRED, and no argument is passed to it, an exception is thrown</li>
+<li>All REQUIRED options should be wrapped in a try/catch block </li>
+</ul>
+</li>
+<li><code>OptionHandler::OPTIONAL</code></li>
+</ul>
+</li>
+<li>
+<code>multiple</code> is a bool indicating whether an argument can take multiple arguments
+
+<ul>
+<li>if <code>multiple</code> is set to <code>false</code> the last argument passed to the option is set as it's only argument</li>
+<li>if <code>multiple</code> is set to <code>true</code> all arguments passed to the option are saved in a <code>vector&lt;string&gt;</code>
+</li>
+</ul>
+</li>
+</ol><h4>Accessing Options</h4>
+
+<p>All accessors are called by passing in the desired option's <code>long_name</code>.</p>
+
+<h5>Checking if an option was set</h5>
+
+<p>To check whether an option has been used, call <code>get_option</code>:</p>
+
+<pre><code>// get_option returns whether an option was set
+bool exists = h.get_option("exists"), 
+     help   = h.get_option("help");
+</code></pre>
+
+<h5>Get an argument passed to an option</h5>
+
+<p>To get the last argument passed to an option, call <code>get_argument</code>:</p>
+
+<pre><code>// get_argument returns a string passed to an option
+std::string song  = h.get_argument("song"),
+            movie = h.get_argument("movie");
+</code></pre>
+
+<h5>Get all arguments passed to an option</h5>
+
+<p>To get a <code>vector&lt;string&gt;</code> of all arguments passed to an option, call <code>get_arguments</code>:</p>
+
+<pre><code>// get_arguments returns a vector of arguments (strings) passed to an option
+std::vector&lt;std::string&gt; albums = h.get_arguments("albums"),
+                         films  = h.get_arguments("films");
+</code></pre>
+
+<h2>License</h2>
+
+<p>Copyright (©) 2012 Ryan Gonzalez <a href="mailto:ryan@ionizedmedia.com">ryan@ionizedmedia.com</a> &amp; Haoran Ning <a href="mailto:hning@umich.edu">hning@umich.edu</a></p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do 
+so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+SOFTWARE.</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
