@@ -134,7 +134,7 @@ namespace OptionHandler {
  **********************************************************/
 
   inline bool Handler::get_option(std::string name) {
-    return ((parsed_input.find(name) != parsed_input.end())  || parsed_input.empty());
+    return ((parsed_input.find(name) != parsed_input.end()) && !parsed_input.empty());
   }
 
 /**********************************************************
@@ -147,10 +147,10 @@ namespace OptionHandler {
  **********************************************************/
 
   inline std::string Handler::get_argument(std::string name) {
-    if (!get_option(name))
+    if (!get_option(name) || parsed_input.at(name).empty())
       return "";
     else
-      return parsed_input.at(name).empty() ? "" : parsed_input.at(name).front();
+      return parsed_input.at(name).front();
   }
 
 /**********************************************************
@@ -178,7 +178,7 @@ namespace OptionHandler {
  *
  **********************************************************/
 
-  inline void Handler::update(Option option) {
+  inline void Handler::update(const Option & option) {
     // Get start of input
     std::vector<std::string>::iterator str = input.begin();
     while (str != input.end()) {
@@ -188,13 +188,13 @@ namespace OptionHandler {
           (*str).substr(2) == option.long_name)) {
 
         // Create empty vector if type = none
-        if (option.type == ArgumentType::NONE)
+        if (option.type == NONE)
           update_none(option, str);
 
-        if(option.type == ArgumentType::REQUIRED)
+        if(option.type == REQUIRED)
           update_required(option, str);
 
-        if(option.type == ArgumentType::OPTIONAL)
+        if(option.type == OPTIONAL)
           update_optional(option, str);
 
       } 
@@ -215,7 +215,7 @@ namespace OptionHandler {
 
   inline void Handler::update_none(const Option & option, std::vector<std::string>::iterator str) {
     if (((str+1) != input.end()) && (!is_long(*(str+1)) && !is_short(*(str+1))))
-      throw argument_for_none();
+      throw argument_for_none(option.long_name);
 
     // Only if it doesn't already exist in map
     if (parsed_input.find(option.long_name) == parsed_input.end()) {
@@ -237,9 +237,9 @@ namespace OptionHandler {
  **********************************************************/
 
   inline void Handler::update_required(const Option & option, std::vector<std::string>::iterator str) {
-    if (((str+1) == input.end()) || (is_long(*(str+1)) || is_short(*(str+1)))) {
-      throw no_argument_for_required();
-    }
+    if (((str+1) == input.end()) || (is_long(*(str+1)) || is_short(*(str+1))))
+      throw no_argument_for_required(option.long_name);
+    
     update_optional(option, str);
   }
 
@@ -272,7 +272,7 @@ namespace OptionHandler {
         // push into arguments vector
         if(option.multiple)
           parsed_input.at(option.long_name).push_back(*(str));
-        else
+        else 
           parsed_input.at(option.long_name)[0] = *str;
       }
       // Next input
