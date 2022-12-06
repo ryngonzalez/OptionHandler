@@ -115,13 +115,16 @@ namespace OptionHandler {
                                       std::string long_name,
                                       ArgumentType type,
                                       bool multiple) {
-
-    // Add to declared options
-    declared_options.push_back(Option(short_name, long_name, type, multiple));
-    // Re-assess input
-    update(declared_options.back());
-    // Chain adding options 
-    return *this;
+    try {
+      // Add to declared options
+      declared_options.push_back(Option(short_name, long_name, type, multiple));
+      // Re-assess input
+      update(declared_options.back());
+      // Chain adding options 
+      return *this;
+    } catch (const std::exception & e) {
+      std::cerr << e.what() << std::endl; 
+    }
   }
 
 /**********************************************************
